@@ -1,0 +1,9 @@
+<robot name="andarilho>
+  <ros_control name="GazeboSystem" type="System">
+    <hardware>
+      <plugin>gazebo_ros_control/GazeboSystem</plugin>
+    </hardware>
+
+
+  </ros_control>
+</robot>

@@ -1,0 +1,11 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 30
+    use_sim_time: true
+
+    diff_cont:
+      type: diff_drive_controller/DiffDrveController
+
+    joint_broad:
+      type: jont_state_broadcaster/JointStateBroadcaster 
+

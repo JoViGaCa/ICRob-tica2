@@ -1,0 +1,9 @@
+<launch>
+  <param name="robot_description" textfile="$(find andarilho_sim)/robo.xml" />
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <node name="gazebo" pkg = "gazebo_ros" type="gazebo"/>
+  
+
+  <!--node name = "joint_pub" pkg = "andarilho_sim" type ="andarilho_pub"/-->
+</launch>
