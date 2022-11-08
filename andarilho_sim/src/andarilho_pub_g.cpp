@@ -21,7 +21,7 @@ class AndarilhoPub{
             LinkState.resize(12);
 
             Joint_base.resize(8);
-            Joint_base = {-40*toRad, 0, -40*toRad, 0, 80*toRad, 80*toRad, -40*toRad, -40*toRad};
+            Joint_base = {-50*toRad, 0, -50*toRad, 0, 70*toRad, 70*toRad, -40*toRad, -40*toRad};
             
 
             joint_pub = nh->advertise<trajectory_msgs::JointTrajectory>("/set_joint_trajectory", 50);
@@ -46,7 +46,7 @@ class AndarilhoPub{
                 traj.points[0].positions[i] = Joint_base[i];
             }
 
-            double posCM[3] = {0,0,1.7};
+            double posCM[3] = {0,0,2.0};
             double offset = atan(0.5/0.38);
             double dQ = 0.628;
             double leg2 = leg*leg;
@@ -61,34 +61,38 @@ class AndarilhoPub{
                 joint_pub.publish(traj);
 
                 ang_quad_dir_y = acos((abs(posCM[1]-0.38))/ dQ);
-                retaH_dir = posCM[2] - dQ*sin(ang_quad_dir_y);
+                retaH_dir = posCM[2] - dQ*sin(ang_quad_dir_y) - 0.3;
                 retaH_dir2 = retaH_dir*retaH_dir;
-                ang_joel_dir = acos((retaH_dir2/(2*leg2)) -1);
-                ang_torn_dir = 90*toRad - ang_joel_dir;
-                ang_quad_dir_x = 90*toRad - ang_joel_dir;
+                ang_joel_dir = acos((retaH_dir2/(-2*leg2)) +1);
+                ang_torn_dir = 90*toRad - ang_joel_dir/2;
+                ang_quad_dir_x = 90*toRad - ang_joel_dir/2;
 
                 ang_quad_esq_y = acos((abs(posCM[1]+0.38))/ dQ);
-                retaH_esq = posCM[2] - dQ*sin(ang_quad_esq_y);
+                retaH_esq = posCM[2] - dQ*sin(ang_quad_esq_y) -0.3;
                 retaH_esq2 = retaH_esq*retaH_esq;
-                ang_joel_esq = acos(((retaH_esq2)/(2*leg2)) -1);
-                ang_torn_esq = 90*toRad - ang_joel_esq;
-                ang_quad_esq_x = 90*toRad - ang_joel_esq;
+                ang_joel_esq = acos(((retaH_esq2)/(-2*leg2)) +1);
+                ang_torn_esq = 90*toRad - ang_joel_esq/2;
+                ang_quad_esq_x = 90*toRad - ang_joel_esq/2;
 
-                ROS_INFO("%.4f - %.4f", ang_joel_dir,ang_joel_esq);
+                ROS_INFO("Ang quad y: %.4f - %.4f", ang_quad_dir_y,ang_quad_esq_y);
+                ROS_INFO("RetaH: %.4f - %.4f", retaH_dir, retaH_esq);
+                ROS_INFO("Ang joel: %.4f - %.4f", ang_joel_dir, ang_joel_esq);
+                ROS_INFO("Ang torn: %.4f - %.4f", ang_torn_dir, ang_torn_esq);
+                ROS_INFO("Ang quad x: %.4f - %.4f", ang_quad_dir_x, ang_quad_esq_x);
 
-                traj.points[0].positions[0] = -(90*toRad - ang_quad_dir_x);
+                traj.points[0].positions[0] = -ang_quad_dir_x;
                 traj.points[0].positions[1] = ang_quad_dir_y - offset;
-                traj.points[0].positions[2] = -(90*toRad - ang_quad_esq_x);
+                traj.points[0].positions[2] = -ang_quad_esq_x;
                 traj.points[0].positions[3] = ang_quad_esq_y - offset;
-                traj.points[0].positions[4] = (180*toRad - ang_joel_dir);
-                traj.points[0].positions[5] = (180*toRad - ang_joel_esq);
+                traj.points[0].positions[4] = 180*toRad - ang_joel_dir;
+                traj.points[0].positions[5] = 180*toRad - ang_joel_esq;
                 traj.points[0].positions[6] = -ang_torn_dir;
                 traj.points[0].positions[7] = -ang_torn_esq;
 
                 for(int i = 0; i < 8; i++){
-                    ROS_INFO("Junta %d Valor %.4f", i, traj.points[0].positions[i]);
+                    //ROS_INFO("Junta %d Valor %.4f", i, traj.points[0].positions[i]);
                 }
-
+                //traj.points[0].positions = Joint_base; 
                 double r = LinkState[0].pose.position.z;
                 double a = (sensor_dir.linear_acceleration.x + sensor_esq.linear_acceleration.x)/2;
                 double g = (sensor_dir.linear_acceleration.z + sensor_esq.linear_acceleration.z)/2;
